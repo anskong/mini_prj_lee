@@ -12,7 +12,7 @@ from langchain_openai import OpenAI as LangchainOpenAI
 llm = LangchainOpenAI(
     openai_api_base="http://localhost:1234/v1",
     openai_api_key="lm-studio",
-    model_name="local-model",
+    model_name="exaone-3.5-2.4b-instruct",
     temperature=0.7,
 )
 
@@ -53,16 +53,19 @@ def match_image_by_index(index, page_images):
     page_num = index + 1
     return page_images.get(page_num, [None])[0]
 
-def ask_llm_with_examples(examples, new_question):
+def ask_llm_with_examples(examples, new_question,pdf_text=None):
     example_prompt = ""
     for ex in examples:
         example_prompt += f"Q: {ex['question']}\nA: {ex['answer']}\n\n"
 
-    prompt = f"""다음은 브로셔 내용을 바탕으로 한 예시 Q&A입니다:
+    prompt = f"""
+문서 내용 {pdf_text[:2000]}를 참조하여 문서 내용을 바탕으로 한 예시 Q&A {example_prompt} 를 참조하여
 
-    {example_prompt}
-    Q: {new_question}
-    A:"""
+다음 질문에 대한 답변을 자세히 알려주세요    
+
+Q: {new_question}
+A:
+"""
 
     estimated_tokens = len(prompt.split())
     print("=" * 50)
@@ -72,6 +75,7 @@ def ask_llm_with_examples(examples, new_question):
 
     try:
         response = llm.invoke(prompt)
+        
         if not response.strip():
             print("⚠️ LLM이 빈 응답을 반환했습니다.")
             return "(LLM 응답 없음)"
@@ -171,7 +175,7 @@ def main():
         title = template.get("title", "제목 없음")
         question = template.get("question", "")
         print(f"📌 '{title}' 새 답변 생성 중...")
-        llm_answer = ask_llm_with_examples(few_shot_examples, question)
+        llm_answer = ask_llm_with_examples(few_shot_examples, question,text)
         original_answer = template.get("answer", "(없음)")
         #comparison = f"[LLM 응답]\n{llm_answer}\n\n[기존 답변]\n{original_answer}"
         comparison = f"{llm_answer}"
