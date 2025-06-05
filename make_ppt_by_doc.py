@@ -13,7 +13,7 @@ llm = LangchainOpenAI(
     openai_api_base="http://localhost:1234/v1",
     openai_api_key="lm-studio",
     model_name="exaone-3.5-2.4b-instruct",
-    temperature=0.7,
+    temperature=0.7,    
 )
 
 MAX_EXAMPLES = 5  # 프롬프트 길이 방지를 위한 최대 예시 수
@@ -85,7 +85,7 @@ A:
         print(f"❌ LLM 호출 실패: {e}")
         return f"(LLM 호출 오류: {e})"
 
-def create_ppt(slide_contents, page_images, output_filename):
+def create_ppt(slide_contents, page_imdages, output_filename):
     prs = Presentation()
 
     title_slide = prs.slides.add_slide(prs.slide_layouts[0])
@@ -115,7 +115,7 @@ def create_ppt(slide_contents, page_images, output_filename):
                     run.font.size = Pt(12)
                     run.font.name = "맑은 고딕"
 
-            matched_image = match_image_by_index(index, page_images)
+            matched_image = match_image_by_index(index, page_imdages)
             if matched_image:
                 slide.shapes.add_picture(matched_image, Inches(5.5), Inches(1.5), width=Inches(3))
 
